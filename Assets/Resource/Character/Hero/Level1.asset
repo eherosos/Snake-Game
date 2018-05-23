@@ -14,4 +14,5 @@ MonoBehaviour:
   profileSprite: {fileID: 21300000, guid: 2a460113ce2575f4ca5528ae5f8a59d0, type: 3}
   heart: 10
   sword: 2
-  shield: 1
+  shield: 3
+  heal: 0

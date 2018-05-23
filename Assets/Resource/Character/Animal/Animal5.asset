@@ -9,10 +9,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3ab0d16afdceed4d874c6eda81e20bc, type: 3}
-  m_Name: Level2
+  m_Name: Animal5
   m_EditorClassIdentifier: 
-  profileSprite: {fileID: 21300000, guid: 6a414beebd539f146979b8126d8aee82, type: 3}
-  heart: 10
-  sword: 2
-  shield: 4
-  heal: 0
+  profileSprite: {fileID: 21300000, guid: 1ea05154482d1ec4683024d4ba131e1d, type: 3}
+  heart: 1
+  sword: 0
+  shield: 0
+  heal: 1
+  type: 1
