@@ -25,7 +25,7 @@ namespace Elven_Path
         public bool isDie = false;
 
         public Sprite profileSprite;
-        protected int heart;
+        public int heart;
         public int Hp
         {
             get { return heart; }
@@ -35,7 +35,7 @@ namespace Elven_Path
                 if (heart <= 0)
                 {
                     isDie = true;
-                    GameManager.instance.gridFieldXY[myIndex.x, myIndex.y] = false;
+                    GameManager.instance.gridFieldXY[myGridX, myGridY] = false;
                 }
             }
         }
@@ -43,6 +43,7 @@ namespace Elven_Path
         public int shield;
         public int heal;
         public SpiritType type;
-        public Vector2Int myIndex;
+        public int myGridX { get; set; }
+        public int myGridY { get; set; }
     }
 }

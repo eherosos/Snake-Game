@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 317931368}
   - component: {fileID: 317931370}
   - component: {fileID: 317931369}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Dirt Block (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -517,7 +517,7 @@ GameObject:
   - component: {fileID: 355646917}
   - component: {fileID: 355646919}
   - component: {fileID: 355646918}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Dirt Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -614,7 +614,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 425480672}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Block Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -648,7 +648,7 @@ GameObject:
   - component: {fileID: 433422053}
   - component: {fileID: 433422055}
   - component: {fileID: 433422054}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Dirt Block (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1410,6 +1410,9 @@ MonoBehaviour:
   startCharacter: {fileID: 11400000, guid: a8e5ce7fe7f8d084b8a6819ca0fd96c7, type: 2}
   characterObject: {fileID: 1799828820568348, guid: 765d35d34f8b90e46bb2d39d4747b5a4,
     type: 2}
+  blockLayer:
+    serializedVersion: 2
+    m_Bits: 256
   speed: 0.1
 --- !u!1 &964662941
 GameObject:
@@ -1933,13 +1936,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f8f5713c66ca3154ebb13d8dd843deac, type: 2}
   - {fileID: 11400000, guid: a64cda30b14100048b08463a11b422ee, type: 2}
   - {fileID: 11400000, guid: a3a69e0fa024e85438cb4c6cd6973dcb, type: 2}
+  heroPrefs: {fileID: 1681178176112822, guid: 86a4eb6c8f2fa36489b7de835d32c27d, type: 2}
+  enemyPrefs: {fileID: 1182773886011952, guid: 265ec96c7e74d1f43b7c63f78c4bf320, type: 2}
+  animalPrefs: {fileID: 1451665504124792, guid: 0023ca8761fd827449b02bb385b3767f,
+    type: 2}
   heroParent: {fileID: 435437239}
   enemyParent: {fileID: 1495017534}
   animalParent: {fileID: 1234637145}
-  countX: 25
-  countY: 13
   startX: -12
   startY: 6
+  countX: 25
+  countY: 13
+  debugText: 
 --- !u!1 &1234637144
 GameObject:
   m_ObjectHideFlags: 0
@@ -2173,7 +2181,7 @@ GameObject:
   - component: {fileID: 1855708002}
   - component: {fileID: 1855708004}
   - component: {fileID: 1855708003}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Dirt Block (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
