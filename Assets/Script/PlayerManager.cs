@@ -138,7 +138,7 @@ namespace Elven_Path
             if (heroes.Count > 0)
             {
                 trains.RemoveAt(trains.Count - 1);
-                string tmp = "{ HP : " + characters[0].Hp + "} {ATK : " + characters[0].sword + "} {DEF : " + characters[0].shield + "} {TYPE : " + characters[0].type + "}";
+                string tmp = "{HP : " + characters[0].Hp + " } {ATK : " + characters[0].sword + " } {DEF : " + characters[0].shield + " } {TYPE : " + characters[0].type + " } {HERO : " + heroes.Count + " }";
                 UIPlayManager.UpdatePlayerStatusTextEvent.Invoke(tmp);
                 Destroy(em);
                 return true;

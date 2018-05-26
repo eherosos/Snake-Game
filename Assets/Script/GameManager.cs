@@ -153,6 +153,7 @@ namespace Elven_Path
             {
                 wave++;
                 UIPlayManager.UpdateWaveTextEvent.Invoke(wave.ToString());
+                SoundFxManager.instance.Sound_OnGenerateEvent.Invoke();
                 isTimeToGen = false;
                 Gen_Hero();
                 Gen_Enemy();
