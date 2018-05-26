@@ -1,12 +1,22 @@
-﻿using System.Collections;
+﻿//using System;
+using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Elven_Path
 {
+    public class SendInt : UnityEvent<int> { }
+
     public class GameManager : MonoBehaviour
     {
-        public static GameManager instance;
+        //public static UnityEvent GenAnythingEvent = new UnityEvent();
+
+        public static System.Action GenAnythingEvent;
+        public static System.Action<GameObject> StartBattleEvent;
+        public static System.Action EndBattleEvent;
+        public static System.Action<int, SpiritType> TakeDamageEvent;
 
         private Vector2 vec;
 
@@ -19,39 +29,71 @@ namespace Elven_Path
         public CharacterProfile[] enemies;
         public CharacterProfile[] animals;
 
-        [SerializeField] private GameObject heroPrefs, enemyPrefs, animalPrefs;
-        public Transform heroParent, enemyParent, animalParent;
+        public GameObject heroPrefs, enemyPrefs, animalPrefs;
 
-        public bool[,] gridFieldXY;
-        public float startX, startY;
+        public Transform mHeroParent, mEnemyParent, mAnimalParent;
+        public static Transform heroParent { get; private set; }
+        public static Transform enemyParent { get; private set; }
+        public static Transform animalParent { get; private set; }
+
+        public static bool[,] gridFieldXY;
+        public const float startX = -11;
+        public const float startY = 5;
         public int countX, countY;
 
-        public Dictionary<GameObject, Character> characters = new Dictionary<GameObject, Character>();
+        private int wave = 1;
+
+        public static Dictionary<GameObject, Character> characters = new Dictionary<GameObject, Character>();
 
         [TextArea(0, 20)]
         public string debugText;
 
+        #region Singleton
         private void Awake()
         {
-            instance = this;
+            //instance = this;
+            heroParent = mHeroParent;
+            enemyParent = mEnemyParent;
+            animalParent = mAnimalParent;
+
+            //GenAnythingEvent.AddListener(Gen_Anything);
+
+            characters = new Dictionary<GameObject, Character>();
 
             gridFieldXY = new bool[countX, countY];
 
-            print(gridFieldXY.Length);
+            //print(gridFieldXY.Length);
 
             isPause = false;
             
+        }
+        private void OnEnable()
+        {
+            GenAnythingEvent += Gen_Anything;
+            TakeDamageEvent += TakeDamage;
+
+            StartBattleEvent += BattleBegin;
+            EndBattleEvent += BattleFinish;
+        }
+        private void OnDisable()
+        {
+            GenAnythingEvent -= Gen_Anything;
+            TakeDamageEvent -= TakeDamage;
+
+            StartBattleEvent -= BattleBegin;
+            EndBattleEvent -= BattleFinish;
         }
         private void Start()
         {
             StartCoroutine(Gen());
         }
+        #endregion
 
         private void Update()
         {
             debugText = "";
-            for (int y = countY - 1; y > -1; y--)
-            //for (int y = 0; y < countY; y++)
+            //for (int y = countY - 1; y > -1; y--)
+            for (int y = 0; y < countY; y++)
             {
                 for(int x = 0; x < countX; x++)
                 {
@@ -59,15 +101,6 @@ namespace Elven_Path
                     else debugText += " - ";
                 }
                 debugText += '\n';
-            }
-
-            if (isBattle || isOver || isPause) return;
-            if (isTimeToGen)
-            {
-                isTimeToGen = false;
-                Gen_Hero();
-                Gen_Enemy();
-                StartCoroutine(Gen());
             }
         }
 
@@ -112,10 +145,24 @@ namespace Elven_Path
             return new Vector2();
         }
 
-        private int wave = 1;
-
+        #region Gen
+        public void Gen_Anything()
+        {
+            if (isBattle || isOver || isPause) return;
+            if (isTimeToGen)
+            {
+                wave++;
+                UIPlayManager.UpdateWaveTextEvent.Invoke(wave.ToString());
+                isTimeToGen = false;
+                Gen_Hero();
+                Gen_Enemy();
+                Gen_Animal();
+                StartCoroutine(Gen());
+            }
+        }
         private void Gen_Hero()
         {
+            //if (Random.Range(0, 1f) < 0.3f) return;
             int tmp_x;
             int tmp_y;
             do
@@ -129,7 +176,7 @@ namespace Elven_Path
             vec.y = startY - tmp_y;
             
             GameObject em = Instantiate(heroPrefs, vec, transform.rotation, heroParent);
-            int tmp_r = Random.Range(0, ((wave > heroes.Length) ? wave : heroes.Length));
+            int tmp_r = Random.Range(0, ((wave < heroes.Length) ? wave : heroes.Length));
 
             em.GetComponent<SpriteRenderer>().sprite = heroes[tmp_r].profileSprite;
 
@@ -138,6 +185,7 @@ namespace Elven_Path
             tmp.heart = heroes[tmp_r].heart;
             tmp.sword = heroes[tmp_r].sword;
             tmp.shield = heroes[tmp_r].shield;
+            tmp.type = heroes[tmp_r].type;
             tmp.myGridX = tmp_x;
             tmp.myGridY = tmp_y;
             characters.Add(em, tmp);
@@ -157,7 +205,7 @@ namespace Elven_Path
             vec.y = startY - tmp_y;
 
             GameObject em = Instantiate(enemyPrefs, vec, transform.rotation, enemyParent);
-            int tmp_r = Random.Range(0, ((wave > enemies.Length) ? wave : enemies.Length));
+            int tmp_r = Random.Range(0, ((wave < enemies.Length) ? wave : enemies.Length));
 
             em.GetComponent<SpriteRenderer>().sprite = enemies[tmp_r].profileSprite;
 
@@ -166,12 +214,15 @@ namespace Elven_Path
             tmp.heart = enemies[tmp_r].heart;
             tmp.sword = enemies[tmp_r].sword;
             tmp.shield = enemies[tmp_r].shield;
+            tmp.type = enemies[tmp_r].type;
             tmp.myGridX = tmp_x;
             tmp.myGridY = tmp_y;
             characters.Add(em, tmp);
         }
         private void Gen_Animal()
         {
+            if (wave < 10) return;
+            if (Random.Range(0, 1f) < 0.75f) return;
             int tmp_x;
             int tmp_y;
             do
@@ -185,20 +236,61 @@ namespace Elven_Path
             vec.y = startY - tmp_y;
 
             GameObject em = Instantiate(animalPrefs, vec, transform.rotation, animalParent);
-            int tmp_r = Random.Range(0, ((wave > animals.Length) ? wave : animals.Length));
+            int tmp_r = Random.Range(0, ((wave < animals.Length) ? wave : animals.Length));
 
             em.GetComponent<SpriteRenderer>().sprite = animals[tmp_r].profileSprite;
-
             Character tmp = new Character();
-            tmp.profileSprite = animals[tmp_r].profileSprite;
-            tmp.heal = animals[tmp_r].heal;
-            tmp.heart = animals[tmp_r].heart;
-            tmp.sword = animals[tmp_r].sword;
-            tmp.shield = animals[tmp_r].shield;
+            tmp.profileSprite = enemies[tmp_r].profileSprite;
+            tmp.heart = enemies[tmp_r].heart;
+            tmp.type = enemies[tmp_r].type;
             tmp.myGridX = tmp_x;
             tmp.myGridY = tmp_y;
             characters.Add(em, tmp);
         }
+        #endregion
+
+        #region Battle
+        private GameObject target;
+        public void BattleBegin(GameObject enemy)
+        {
+            target = enemy;
+            Character tmp = characters[enemy];
+            UIPlayManager.EnableBattlePanelEvent.Invoke(true);
+            string tmp2 = "ATK : " + tmp.sword + "\n" + "DEF : " + tmp.shield + "\n" + "TYPE : " + tmp.type;
+            UIPlayManager.BeginUpdateEnemyBattlePanelEvent.Invoke(tmp.profileSprite, tmp.heart.ToString(), tmp2);
+        }
+        public void TakeDamage(int damage,SpiritType type)
+        {
+            //print("Enemy Hurt");
+            if (type == characters[target].type)
+                damage = damage * 2;
+            UIPlayManager.ShakeEnemyPanelEvent.Invoke();
+            characters[target].Hp -= (damage - characters[target].shield > 0) ? damage : 1;
+            UIPlayManager.UpdateEnemyBattleHeartEvent.Invoke(characters[target].Hp.ToString());
+            StartCoroutine(Delay());
+        }
+        private IEnumerator Delay()
+        {
+            yield return new WaitForSeconds(0.5f);
+            if (!characters[target].isDie) StrikeBack();
+            else Reward();
+        }
+        private void StrikeBack()
+        {
+            PlayerManager.TakeDamageEvent.Invoke(characters[target].sword, characters[target].type);
+            SoundFxManager.instance.Sound_OnAttackEvent.Invoke();
+        }
+        private void Reward()
+        {
+            //print("Reward");
+            GameManager.gridFieldXY[characters[target].myGridX, characters[target].myGridY] = false;
+            characters.Remove(target);
+            Destroy(target);
+            EndBattleEvent.Invoke();
+            UIPlayManager.EnableBattlePanelEvent.Invoke(false);
+        }
+        public void BattleFinish() { UIPlayManager.EnableBattlePanelEvent.Invoke(false); }
+        #endregion
 
     }
 }

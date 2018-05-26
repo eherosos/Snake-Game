@@ -6,7 +6,8 @@ namespace Elven_Path
 {
     public enum SpiritType
     {
-        Red_Spirit, Green_Spirit, Blue_Spirit
+        Mortal,Wild,Spirit
+        //,Red_Spirit, Green_Spirit, Blue_Spirit
     }
 
     [CreateAssetMenu(fileName = "Character Name", menuName = "Make a character")]
@@ -31,11 +32,14 @@ namespace Elven_Path
             get { return heart; }
             set
             {
+                if (isDie) return;
                 heart = value;
                 if (heart <= 0)
                 {
+                    //Debug.Log("Die");
                     isDie = true;
-                    GameManager.instance.gridFieldXY[myGridX, myGridY] = false;
+                    heart = 0;
+                    //GameManager.gridFieldXY[myGridX, myGridY] = false;
                 }
             }
         }
@@ -43,7 +47,7 @@ namespace Elven_Path
         public int shield;
         public int heal;
         public SpiritType type;
-        public int myGridX { get; set; }
-        public int myGridY { get; set; }
+        public int myGridX;// { get; set; }
+        public int myGridY;// { get; set; }
     }
 }

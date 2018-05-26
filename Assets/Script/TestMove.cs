@@ -4,12 +4,6 @@ using UnityEngine;
 
 namespace Elven_Path
 {
-    public enum Direction
-    {
-        Up, Down,
-        Right, Left
-    }
-
     public class TestMove : MonoBehaviour
     {
         #region Value
